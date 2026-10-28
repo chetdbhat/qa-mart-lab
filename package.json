@@ -1,27 +1,28 @@
 {
-  "name": "qa-mart-lab",
-  "version": "4.0.0",
+  "name": "chetanbhat",
+  "version": "1.0.2",
   "private": true,
-  "description": "QA Mart lab: Playwright practice and a playground for building GitHub Copilot agent customizations",
+  "type": "module",
   "scripts": {
-    "start": "node app/server.js",
-    "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:v2": "playwright test --project=ui-v2",
-    "test:legacy": "playwright test --project=legacy",
-    "test:seeded": "playwright test --project=seeded",
-    "typecheck": "tsc --noEmit",
-    "lint:specs": "node scripts/lint-specs.cjs",
-    "mcp:smoke": "node scripts/mcp-smoke.cjs",
-    "flaky": "playwright test --project=legacy --repeat-each=5",
-    "codegen": "playwright codegen --output tests/lab/recorded.spec.ts http://localhost:3000/login",
-    "demo:trace": "playwright test --project=demo --trace on",
-    "report": "playwright show-report"
+    "test": "node --test tests/*.test.mjs",
+    "validate": "node scripts/validate.mjs",
+    "test:e2e": "playwright test",
+    "demo": "playwright test --project=chromium",
+    "demo:validation": "playwright test tests/e2e/login.spec.mjs tests/e2e/checkout.spec.mjs --project=chromium",
+    "verify:mcp": "node scripts/verify-mcp.mjs",
+    "verify:clean": "node scripts/clean-install.mjs",
+    "verify:clean:validation": "node scripts/clean-install.mjs --validation-only",
+    "verify:live": "node scripts/verify-live.mjs",
+    "verify:live:generate": "node scripts/verify-live.mjs --generate",
+    "build:plugin": "node scripts/build-dist.mjs",
+    "package:plugin": "node scripts/build-dist.mjs && npm pack ./.artifacts/dist/chetanbhat"
   },
+  "files": ["plugin.json", "mcp.json", "com.github.copilot", "skills", "scripts", "tests", "playwright.config.mjs", "README.md", "docs", ".github/plugin", "npm-shrinkwrap.json"],
   "devDependencies": {
-    "@playwright/test": "~1.64.0",
-    "@types/node": "^24.0.0",
-    "typescript": "^5.6.0"
+    "@playwright/test": "1.64.1",
+    "@modelcontextprotocol/sdk": "1.25.2",
+    "yaml": "2.8.1",
+    "ajv": "8.17.1"
   },
-  "engines": { "node": ">=20" }
+  "engines": { "node": ">=22" }
 }

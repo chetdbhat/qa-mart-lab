@@ -1,8 +1,11 @@
 node_modules/
-test-results/
+.env
+.env.*
+!.env.example
 playwright-report/
-blob-report/
-reports/
-playwright/.auth/
-.github/hooks/tool-use.log
-qamart-testing-plugin/hooks/qamart-plugin.log
+test-results/
+.artifacts/
+*.tgz
+*.log
+.qodo/
+.playwright-mcp/

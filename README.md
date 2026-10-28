@@ -1,71 +1,92 @@
-# QA Mart lab
+# Chetanbhat: QA Mart Testkit
 
-A small shop app plus a Playwright project. Two uses:
+Installable GitHub Copilot Agent Plugins 1.0 bundle for https://qamart.vercel.app.
+Protects login validation, bag quantity/totals, and checkout pre-submit validation.
+Requires Node.js 22+, npm, Git on PATH for remote installation, Copilot CLI with Agent Plugins 1.0 support, and internet access.
+Use the Copilot harness in VS Code; other harnesses may not load client-specific components.
 
-1. Practise Playwright: locators, Page Objects, flaky tests, v1 and v2 designs.
-2. A **playground for GitHub Copilot agent customizations**: build instructions, prompts, skills, custom agents, hooks and a plugin with an MCP server, against a codebase that has real conventions, planted bugs, stories and test reports.
+## Install
 
-Everything runs on your machine. The app has no dependencies besides Node.
+Published repository: https://github.com/chetdbhat/qa-mart-testkit
 
-## 1. Set up (once)
-Needs Node.js 20 or newer.
-
-```bash
-npm install
-npx playwright install chromium
-npm test
+```powershell
+copilot plugin install chetdbhat/qa-mart-testkit
 ```
-`npm test` starts the app for you (see `webServer` in `playwright.config.ts`) and should end with all tests passed.
 
-For the Copilot playground, continue with [exercises/00-start-here.md](exercises/00-start-here.md).
+From a downloaded or cloned copy, build the dependency-free distribution first:
 
-## 2. Look around the app
-```bash
-npm start
+```powershell
+npm ci
+npm run build:plugin
+copilot plugin install "./.artifacts/dist/chetanbhat"
+copilot plugin list --json
 ```
-Open http://localhost:3000 and sign in as `asha@qamart.test` / `Test@1234`.
-Use the footer links to switch between the v1 design and the v2 redesign. The app listens on 127.0.0.1 only.
 
-## Commands
-| Command | What it does |
-|---|---|
-| `npm start` | Runs QA Mart at http://localhost:3000 (keep it running while you record) |
-| `npm test` | Runs your tests (chromium project) and writes `reports/results.json` |
-| `npm run test:ui` | Opens UI mode: watch, time-travel and pick locators |
-| `npm run codegen` | Records into `tests/lab/recorded.spec.ts` (needs `npm start` running) |
-| `npm run test:v2` | Runs your tests plus the legacy suite against the v2 redesign (not the seeded tests or the trainer demo) |
-| `npm run test:legacy` | Runs the inherited legacy test once |
-| `npm run flaky` | Runs the legacy test 5 times to expose flakiness |
-| `npm run test:seeded` | Runs correct tests that fail on purpose because of planted bugs (5 failures) |
-| `npm run typecheck` | `tsc --noEmit` over tests and pages |
-| `npm run lint:specs` | Convention check for specs and Page Objects (hard waits, XPath, hard-coded credentials, ...) |
-| `npm run mcp:smoke` | Starts the app on port 3199 (`SMOKE_PORT` to change it) and drives the trainer MCP server over stdio |
-| `npm run report` | Opens the last HTML report |
-| `npm run demo:trace` | Trainer demo: one failing test with a full trace |
+CLI 1.0.104 did not enumerate native plugin rules here. For verified always-on project instructions, run `node scripts/setup-workspace.mjs "PATH/TO/QA-MART-WORKSPACE"` from this plugin folder, then `copilot instruction list --json` in that workspace. The helper combines the two packaged rule files and refuses to overwrite different existing instructions. Prompts and agents also explicitly request those rules.
 
-## Folders
-- `app/`: the QA Mart app (do not edit during the lab)
-- `pages/`: your Page Objects go here
-- `tests/tour/`: working examples to read
-- `tests/seeded/`: correct tests that expose planted bugs
-- `tests/legacy/`: the inherited script you will review
-- `tests/lab/`: your lab tests go here
-- `tests/fixtures.ts`: `api` and `signedInPage` fixtures
-- `tests/test-data.ts`: accounts, shipping data, products and coupons
-- `docs/stories/`: user stories US-101 to US-106
-- `docs/team-conventions.md`: the house rules for tests
-- `docs/templates/`: bug-report and test-case templates
-- `docs/api/openapi.yaml`: API contract
-- `exercises/`: the six Copilot customization exercises (start at `00-start-here.md`)
-- `solutions/`: trainer reference (not loaded by Copilot)
-- `.github/`: where testers build their customizations (empty on purpose, except `copilot/settings.json`, which recommends the team's agent plugin)
-- `scripts/`: `lint-specs.cjs` and `mcp-smoke.cjs`
+VS Code discovers default-home CLI installs. Reload VS Code, select Copilot, then check agents, slash commands, skills, hooks, and MCP: List Servers.
+An isolated COPILOT_HOME install is deliberately not registered in your normal VS Code profile.
+Review executable hooks/MCP trust before enabling. Do not use blanket allow-all permissions.
 
-## App features
-Sign in, products (some out of stock), cart, checkout with coupons, order confirmation, order history at `/orders`. API endpoints are in `docs/api/openapi.yaml`. `/api/test/reset` and `/api/test/orders` help tests and tools; set `QAMART_TEST_API=0` to switch them off.
+Marketplace install: `copilot plugin marketplace add chetdbhat/qa-mart-testkit`, then `copilot plugin install chetanbhat@qamart-qa`.
+The plugin is named `chetanbhat` from version 1.0.2 onward. The repository remains `chetdbhat/qa-mart-testkit` and the marketplace remains `qamart-qa`.
+The current CLI warns that direct installs may be deprecated in a future release.
 
-## Accounts
-asha@qamart.test, ravi@qamart.test, locked@qamart.test. Password for all: `Test@1234`.
+## Six Components
 
-## Port 3000 busy?
-`PORT=3100 npm test` (macOS/Linux) or `$env:PORT=3100; npm test` (PowerShell). For `npm start`, set PORT the same way. If tests behave strangely, check `lsof -i :3000`: Playwright reuses whatever answers on the port. The legacy test hard-codes `localhost:3000` on purpose (it is a review exercise), so with another `PORT` it fails with a connection error. `npm run codegen` and the plugin's `mcp.json` (`QAMART_URL`) also point at 3000: run `npx playwright codegen --output tests/lab/recorded.spec.ts http://localhost:3100/login` instead, and edit `QAMART_URL`.
+| Type | Included |
+| --- | --- |
+| Instructions | playwright.instructions.md, safety.instructions.md |
+| Prompts | /gen-smoke-tests, /review-flaky-test |
+| Skills | checkout-test-design, bug-report-writer |
+| Agents | qamart-planner (read-only), qamart-generator (test edits + selected browser tools; no shell/eval) |
+| MCP | pinned Playwright MCP, Microsoft Learn read-only docs MCP; neither needs an API key |
+| Hooks | preToolUse rejects .only writes and checks staged specs before commits; postToolUse lints edited specs |
+
+Portable skills and MCP use fixed root paths. Copilot discovers agents/commands/rules/hooks under `com.github.copilot`; do not add legacy top-level component paths to the manifest.
+The marketplace catalog is at `.github/plugin/marketplace.json`.
+
+## 60-Second Demo
+
+1. Select qamart-planner and ask for QM-CART-001 cases from docs/flows.md.
+2. Select qamart-generator; invoke `/gen-smoke-tests QM-CART-001`. Let it inspect the approved browser, then generate a spec. It cannot run shell commands; review its focused run command.
+3. In a terminal, run `npx playwright test tests/e2e/checkout.spec.mjs`. Show the real required-field and email validation assertions. Run `npm run demo` separately to include the known cart regression; do not call the full suite green.
+4. Invoke `/review-flaky-test tests/e2e/cart.spec.mjs` with a sanitized failure, or run `npm test` to demonstrate the hook rejecting a focused test without editing the real suite.
+
+CLI agent IDs are qualified: `chetanbhat:qamart-planner` and `chetanbhat:qamart-generator`.
+`npm run verify:live` verifies the authenticated review prompt and both lifecycle hooks in an isolated profile.
+`npm run verify:live:generate` inspects real checkout, generates a spec in the ignored demo folder, and runs it. The recorded demo produced 7 passing tests without submitting an order.
+Live proof and transcripts stay under `.artifacts/`; hook audit contains only timestamps, lifecycle names, and tool names, never arguments or results.
+
+First-time test-runner browser setup: `npx playwright install chromium`.
+The pinned MCP uses a separate build: `npx --yes @playwright/mcp@0.0.83 install-browser chrome-for-testing`.
+Run `npm run validate` for YAML/component checks, `node scripts/verify-schemas.mjs` for official JSON schemas, `npm test` for hook behavior, and `npm run verify:mcp` for actual MCP handshakes and tool calls.
+Run `npm run verify:clean` to install into a fresh OS temp directory, install dependencies independently, and execute tests from the installed plugin. Proof is written under `.artifacts/` (ignored).
+Use `npm run verify:clean:validation` for an explicitly scoped login/checkout demo while the external cart regression is open. The proof records that scope; it is not a full-suite pass.
+Run `npm run package:plugin` to create the distributable tarball.
+The archive includes an npm shrinkwrap for reproducible `npm ci`; no node_modules, browser profile, credentials, or raw test reports are bundled.
+
+## Safety And Limits
+
+- No committed credentials, storage state, cookies, or API keys. Public demo credentials are read through the live fill control, never copied into specs.
+- Tests never place an order, create accounts, mutate admin data, or invoke payment.
+- Browser origin lists are defense in depth, not a sandbox; redirects and same-origin mutations still require normal approval and human review.
+- Hooks use conservative source-pattern checks, not a security sandbox or a full TypeScript parser. They may flag examples/comments; arbitrary shell writes, aliases, obfuscation, and hook tampering are not fully prevented. Post-edit warnings cannot undo an edit. Copilot hook timeouts fall through to normal permissions.
+- Staged commit protection requires Git on PATH. It denies the attempted commit if Git inspection fails. It is not a standalone Git pre-commit hook and cannot intercept commits outside Copilot.
+- Report artifacts may contain sensitive application data; ignored traces/screenshots must be reviewed before sharing.
+- Positive login, persisted checkout cart state, remote publishing, and UI picker discovery are only verified if recorded in docs/evidence.md. The included login/checkout specs validate safe required-field boundaries, not completed authentication or purchase.
+- The latest sandbox run exposed an add-to-bag regression. The suite deliberately remains red for that failure; run `npx playwright test tests/e2e/login.spec.mjs tests/e2e/checkout.spec.mjs` to demo the previously confirmed non-submitting boundaries while triaging cart.
+
+## Publish
+
+Authenticate locally with `gh auth login`; never paste a token into chat or a file.
+The repository was published through the authenticated GitHub Git Data API because local Git was initially unavailable. Review the allowlist with a non-writing dry run, then update the existing repository:
+
+```powershell
+node scripts/publish-github.mjs
+node scripts/publish-github.mjs --publish --update
+```
+
+The publisher uploads only explicit source folders, rejects symlinks and obvious tokens/private keys, and verifies the remote commit and manifest. Review all source for other sensitive data before publishing; the pattern scan is not a full secret detector.
+Share https://github.com/chetdbhat/qa-mart-testkit in class chat manually.
+See docs/evidence.md for exact verified results and remaining submission gates.
